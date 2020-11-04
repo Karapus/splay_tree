@@ -1,7 +1,6 @@
 #pragma once
 #include "splay_tree.hpp"
 #include <cassert>
-#include <queue>
 #include <stack>
 #include <utility>
 
