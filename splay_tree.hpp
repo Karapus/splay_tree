@@ -25,9 +25,9 @@ class SplayTree final {
 	SplayTree(SplayTree &&other) = delete;
 	SplayTree &operator = (SplayTree &&other) = delete;
 
-	SplayTree *search(const T &elem);
-	SplayTree *lowerBound(const T &elem);
-	SplayTree *upperBound(const T &elem);
+	SplayTree *search(const T &elem, SplayTree *&root);
+	SplayTree *lowerBound(const T &elem, SplayTree *&root);
+	SplayTree *upperBound(const T &elem, SplayTree *&root);
 
 	SplayTree *insert(const T &elem);
 
@@ -112,31 +112,31 @@ SplayTree<T> *SplayTree<T>::insert(const T &elem) {
 }
 
 template <typename T>
-SplayTree<T> *SplayTree<T>::search(const T &elem) {
+SplayTree<T> *SplayTree<T>::search(const T &elem, SplayTree *&root) {
 	auto node = this;
 	while (true) {
 		if (elem < node->val_) {
 			if (!node->left_) {
-				node->splay();
+				root = node->splay();
 				return nullptr;
 			}
 			node = node->left_;
 		}
 		else if (elem > node->val_) {
 			if (!node->right_) {
-				node->splay();
+				root = node->splay();
 				return nullptr;
 			}
 			node = node->right_;
 		}
 		else
-			return node->splay();
+			return root = node->splay();
 	}
 }
 
 template <typename T>
-SplayTree<T> *SplayTree<T>::lowerBound(const T &elem) {
-	const SplayTree *prev = nullptr;
+SplayTree<T> *SplayTree<T>::lowerBound(const T &elem, SplayTree *&root) {
+	SplayTree *prev = nullptr;
 	auto node = this;
 	while (node) {
 		if (elem < node->val_) {
@@ -146,14 +146,14 @@ SplayTree<T> *SplayTree<T>::lowerBound(const T &elem) {
 		else if (elem > node->val_)
 			node = node->right_;
 		else
-			return node->splay();
+			return node;
 	}
-	return prev->splay();
+	return prev;
 }
 
 template <typename T>
-SplayTree<T> *SplayTree<T>::upperBound(const T &elem) {
-	const SplayTree *prev = nullptr;
+SplayTree<T> *SplayTree<T>::upperBound(const T &elem, SplayTree *&root) {
+	SplayTree *prev = nullptr;
 	auto node = this;
 	while (node) {
 		if (elem < node->val_) {
@@ -163,7 +163,7 @@ SplayTree<T> *SplayTree<T>::upperBound(const T &elem) {
 		else
 			node = node->right_;
 	}
-	return prev->splay();
+	return prev;
 }
 
 template <typename T>

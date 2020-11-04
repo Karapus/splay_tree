@@ -51,7 +51,7 @@ class SplaySet final {
 	void erase(const T &elem) {
 		if (!root_)
 			return;
-		auto node = root_->search(elem);
+		auto node = root_->search(elem, root_);
 		root_ = node->deleteNode();
 	}
 	bool empty() const {
@@ -67,8 +67,22 @@ class SplaySet final {
 			return root_->max();
 		return nullptr;
 	}
-	std::size_t range_query(const std::pair<T, T> &query) {
-//		return  root_->order(query.second) - root_->order(query.first) + (root_->search(query.second) ? 1 : 0);
+	const SplayTree<T> *lowerBound(const T &val) {
+		return root_->lowerBound(val, root_);
+	}
+	const SplayTree<T> *upperBound(const T &val) {
+		return root_->upperBound(val, root_);
+	}
+	std::size_t rangeQuery(const std::pair<T, T> &query) {
+		assert(query.first <= query.second);
+		auto lb = lowerBound(query.first);
+		auto ub = upperBound(query.second);
+		std::size_t dist = 0;
+		while (lb != ub) {
+			lb = lb->next();
+			++dist;
+		}
+		return dist;
 	}
 };
 

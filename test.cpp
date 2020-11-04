@@ -86,37 +86,33 @@ TEST(SearchTree, Erase) {
 	}
 	EXPECT_TRUE(set.empty());
 }
-#if 0
 TEST(RangeQuery, LowerBound) {
 	std::vector<T> v{{1, 2, 3, 5, 6}};
 	Splay::SplaySet<T> set{v.begin(), v.end()};
-	auto root = set.get_root();
-	EXPECT_EQ(root->lower_bound(0)->get_val(), 1);
-	EXPECT_EQ(root->lower_bound(4)->get_val(), 5);
-	EXPECT_EQ(root->lower_bound(5)->get_val(), 5);
-	EXPECT_EQ(root->lower_bound(7), nullptr);
+	EXPECT_EQ(set.lowerBound(0)->get_val(), 1);
+	EXPECT_EQ(set.lowerBound(4)->get_val(), 5);
+	EXPECT_EQ(set.lowerBound(5)->get_val(), 5);
+	EXPECT_EQ(set.lowerBound(7), nullptr);
 }
 
 TEST(RangeQuery, UpperBound) {
 	std::vector<T> v{{1, 2, 3, 5, 6}};
 	Splay::SplaySet<T> set{v.begin(), v.end()};
-	auto root = set.get_root();
-	EXPECT_EQ(root->upper_bound(5)->get_val(), 6);
-	EXPECT_EQ(root->upper_bound(4)->get_val(), 5);
-	EXPECT_EQ(root->upper_bound(0)->get_val(), 1);
-	EXPECT_EQ(root->upper_bound(6), nullptr);
+	EXPECT_EQ(set.upperBound(5)->get_val(), 6);
+	EXPECT_EQ(set.upperBound(4)->get_val(), 5);
+	EXPECT_EQ(set.upperBound(0)->get_val(), 1);
+	EXPECT_EQ(set.upperBound(6), nullptr);
 }
 
 TEST(RangeQuery, RangeQuery) {
 	std::vector<T> v{{1, 2, 3, 5, 6}};
 	Splay::SplaySet<T> set{v.begin(), v.end()};
-	EXPECT_EQ(set.range_query({1, 6}), 5);
-	EXPECT_EQ(set.range_query({0, 7}), 5);
-	EXPECT_EQ(set.range_query({1, 4}), 3);
-	EXPECT_EQ(set.range_query({4, 6}), 2);
-	EXPECT_EQ(set.range_query({5, 5}), 1);
-	EXPECT_EQ(set.range_query({4, 4}), 0);
-	EXPECT_EQ(set.range_query({0, 0}), 0);
+	EXPECT_EQ(set.rangeQuery({1, 6}), 5);
+	EXPECT_EQ(set.rangeQuery({0, 7}), 5);
+	EXPECT_EQ(set.rangeQuery({1, 4}), 3);
+	EXPECT_EQ(set.rangeQuery({4, 6}), 2);
+	EXPECT_EQ(set.rangeQuery({5, 5}), 1);
+	EXPECT_EQ(set.rangeQuery({4, 4}), 0);
+	EXPECT_EQ(set.rangeQuery({0, 0}), 0);
 }
-#endif
 }
