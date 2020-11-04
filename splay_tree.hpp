@@ -10,26 +10,30 @@ class SplayTree final {
 		   *left_ = nullptr,
 		   *right_ = nullptr;
 
-	SplayTree *splay();
 	void rotateLeft();
 	void rotateRight();
 	
-	~SplayTree() = default;
-
 	public:
 	SplayTree(const T &elem, SplayTree *parent = nullptr) :
 		val_(elem), parent_(parent)
 	{}
+	~SplayTree() {
+		assert(!left_ && !right_);
+		if (parent_) {
+			if (parent_->left_ == this)
+				parent_->left_ = nullptr;
+			else 
+				parent_->right_ = nullptr;
+		}
+	}
+
 	SplayTree(const SplayTree &other) = delete;
 	SplayTree &operator = (const SplayTree &other) = delete;
 	SplayTree(SplayTree &&other) = delete;
 	SplayTree &operator = (SplayTree &&other) = delete;
 
-	SplayTree *search(const T &elem, SplayTree *&root);
-	SplayTree *lowerBound(const T &elem, SplayTree *&root);
-	SplayTree *upperBound(const T &elem, SplayTree *&root);
-
 	SplayTree *insert(const T &elem);
+	SplayTree *splay();
 
 	T get_val() const {
 		return val_;
@@ -79,16 +83,7 @@ class SplayTree final {
 	}
 
 	SplayTree *deleteNode();
-	void deleteLeaf();
 };
-
-template <typename T>
-std::ostream &operator << (std::ostream &os, const SplayTree<T> &tree) {
-	auto max = tree.max();
-	for (auto node = tree.min(); node != max; node = node->next())
-		os << node->get_val() << ' ';
-	return os << max->get_val() << std::endl;
-}
 
 template <typename T>
 SplayTree<T> *SplayTree<T>::insert(const T &elem) {
@@ -112,61 +107,6 @@ SplayTree<T> *SplayTree<T>::insert(const T &elem) {
 }
 
 template <typename T>
-SplayTree<T> *SplayTree<T>::search(const T &elem, SplayTree *&root) {
-	auto node = this;
-	while (true) {
-		if (elem < node->val_) {
-			if (!node->left_) {
-				root = node->splay();
-				return nullptr;
-			}
-			node = node->left_;
-		}
-		else if (elem > node->val_) {
-			if (!node->right_) {
-				root = node->splay();
-				return nullptr;
-			}
-			node = node->right_;
-		}
-		else
-			return root = node->splay();
-	}
-}
-
-template <typename T>
-SplayTree<T> *SplayTree<T>::lowerBound(const T &elem, SplayTree *&root) {
-	SplayTree *prev = nullptr;
-	auto node = this;
-	while (node) {
-		if (elem < node->val_) {
-			prev = node;
-			node = node->left_;
-		}
-		else if (elem > node->val_)
-			node = node->right_;
-		else
-			return node;
-	}
-	return prev;
-}
-
-template <typename T>
-SplayTree<T> *SplayTree<T>::upperBound(const T &elem, SplayTree *&root) {
-	SplayTree *prev = nullptr;
-	auto node = this;
-	while (node) {
-		if (elem < node->val_) {
-			prev = node;
-			node = node->left_;
-		}
-		else
-			node = node->right_;
-	}
-	return prev;
-}
-
-template <typename T>
 SplayTree<T> *SplayTree<T>::deleteNode() {
 	auto node = this;
 	while (node->right_ || node->left_) {
@@ -175,22 +115,10 @@ SplayTree<T> *SplayTree<T>::deleteNode() {
 		node = next;
 	}
 	auto res = node->parent_;
-	node->deleteLeaf();
+	delete node;
 	return res ? res->splay() : nullptr;
 }
 
-template <typename T>
-void SplayTree<T>::deleteLeaf() {
-	assert(!left_ && !right_);
-	if (parent_) {
-		if (parent_->left_ == this)
-			parent_->left_ = nullptr;
-		else 
-			parent_->right_ = nullptr;
-	}
-	delete this;
-}
-	
 template <typename T>
 const SplayTree<T> *SplayTree<T>::next() const{
 	if (right_)

@@ -45,6 +45,23 @@ TEST(SearchTree, CtorFromRange) {
 	}
 }
 
+TEST(SearchTree, CopyCtor) {
+	std::default_random_engine e;
+	std::uniform_int_distribution<T> distr{0, ksize};
+	std::vector<T> v;
+	for (std::size_t i = 0; i < ksize; ++i)
+		v.push_back(distr(e));
+	Splay::SplaySet<T> set1{v.begin(), v.end()};
+	Splay::SplaySet<T> set2{set1};
+	std::sort(v.begin(), v.end());
+	auto el = set2.min();
+	for (auto i : v)
+	{
+		EXPECT_EQ(el->get_val(), i);
+		el = el->next();
+	}
+}
+
 TEST(SearchTree, DeleteRootNoChildren) {
 	Splay::SplaySet<T> set;
 	set.insert(1);

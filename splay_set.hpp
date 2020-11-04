@@ -42,18 +42,13 @@ class SplaySet final {
 	const SplayTree<T> *get_root() const {
 		return root_;
 	}
-	void insert(const T &elem) {
-		if (!root_)
-			root_ = new SplayTree<T>{elem};
+	const SplayTree<T> *insert(const T &elem) {
+		if (root_)
+			return root_ = root_->insert(elem);
 		else
-			root_ = root_->insert(elem);
+			return root_ = new SplayTree<T>{elem};
 	}
-	void erase(const T &elem) {
-		if (!root_)
-			return;
-		auto node = root_->search(elem, root_);
-		root_ = node->deleteNode();
-	}
+	void erase(const T &elem);
 	bool empty() const {
 		return !root_;
 	}
@@ -67,12 +62,10 @@ class SplaySet final {
 			return root_->max();
 		return nullptr;
 	}
-	const SplayTree<T> *lowerBound(const T &val) {
-		return root_->lowerBound(val, root_);
-	}
-	const SplayTree<T> *upperBound(const T &val) {
-		return root_->upperBound(val, root_);
-	}
+	const SplayTree<T> *search(const T &elem);
+	const SplayTree<T> *lowerBound(const T &val);
+	const SplayTree<T> *upperBound(const T &val);
+
 	std::size_t rangeQuery(const std::pair<T, T> &query) {
 		assert(query.first <= query.second);
 		auto lb = lowerBound(query.first);
@@ -90,17 +83,10 @@ template <typename T>
 void SplaySet<T>::copyTree(const SplaySet &other) {
 	if (!other.root_)
 		return;
-	std::queue<const SplayTree<T> *> nodes;
-	nodes.push(other.root_);
-	while (!nodes.empty()) {
-		auto node = nodes.front();
-		nodes.pop();
-		root_ = root_->insert(node->get_val());
-		if (node->left)
-			nodes.push(node->left);
-		if (node->right)
-			nodes.push(node->right);
-	}
+	auto max = other.max();
+	for (auto node = other.min(); node != max; node = node->next())
+		insert(node->get_val());
+	insert(max->get_val());
 }
 
 template <typename T>
@@ -112,7 +98,7 @@ void SplaySet<T>::deleteTree() {
 		auto left = node->get_left();
 		auto right = node->get_right();
 		if (!left && !right) {
-			node->deleteLeaf();
+			delete node;
 			node = nodes.top();
 			nodes.pop();
 		}
@@ -120,6 +106,83 @@ void SplaySet<T>::deleteTree() {
 			nodes.push(node);
 			node = left ? left : right;
 		}
+	}
+}
+
+template <typename T>
+const SplayTree<T> *SplaySet<T>::search(const T &elem) {
+	while (true) {
+		if (elem < root_->get_val()) {
+			if (!root_->get_left()) {
+				root_->splay();
+				return nullptr;
+			}
+			root_ = root_->get_left();
+		}
+		else if (elem > root_->get_val()) {
+			if (!root_->get_right()) {
+				root_->splay();
+				return nullptr;
+			}
+			root_ = root_->get_right();
+		}
+		else
+			return root_->splay();
+	}
+}
+
+template <typename T>
+const SplayTree<T> *SplaySet<T>::lowerBound(const T &val) {
+	SplayTree<T> *lprev = nullptr, *rprev;
+	while (root_) {
+		if (val < root_->get_val()) {
+			lprev = root_;
+			root_ = root_->get_left();
+		}
+		else if (val > root_->get_val()) {
+			rprev = root_;
+			root_ = root_->get_right();
+		}
+		else
+			return root_->splay();
+	}
+	if (lprev)
+		return (root_ = lprev)->splay();
+	(root_ = rprev)->splay();
+	return nullptr;
+}
+
+template <typename T>
+const SplayTree<T> *SplaySet<T>::upperBound(const T &val) {
+	SplayTree<T> *lprev = nullptr, *rprev;
+	while (root_) {
+		if (val < root_->get_val()) {
+			lprev = root_;
+			root_ = root_->get_left();
+		}
+		else {
+			rprev = root_;
+			root_ = root_->get_right();
+		}
+	}
+	if (lprev)
+		return (root_ = lprev)->splay();
+	(root_ = rprev)->splay();
+	return nullptr;
+}
+
+template <typename T>
+void SplaySet<T>::erase(const T &elem) {
+	auto node = root_;
+	while (node) {
+		if (elem == node->get_val()) {
+			root_ = node->deleteNode();
+			return;
+		}
+		else if (elem < node->get_val())
+			node = node->get_left();
+		else
+			node = node->get_right();
 	}
 }
 } //namespace Splay
