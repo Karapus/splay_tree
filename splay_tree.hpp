@@ -54,7 +54,6 @@ class SplayTree final {
 		return parent_;
 	}
 	const SplayTree *min() const {
-		assert(this);
 		auto node = this;
 		while (node->left_)
 			node = node->left_;
@@ -64,7 +63,6 @@ class SplayTree final {
 		return const_cast<SplayTree *>(const_cast<const SplayTree *>(this)->min());
 	}
 	const SplayTree *max() const {
-		assert(this);
 		auto node = this;
 		while (node->right_)
 			node = node->right_;
